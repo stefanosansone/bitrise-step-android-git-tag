@@ -22,6 +22,11 @@ func main() {
 		os.Exit(1)
 	}
 
+	removeStringList := os.Getenv("remove_string_list")
+	if removeStringList == "" {
+		log.Warnf("Remove string list is not set")
+	}
+
 	versionName, err := extractVersionName(gradleFile)
 	if err != nil {
 		log.Errorf("Failed to extract versionName: %v", err)
@@ -34,7 +39,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	versionNameBase := cleanVersionName(versionName)
+	versionNameBase := cleanVersionName(versionName, removeStringList)
 	log.Infof("Base versionName: '%s'", versionNameBase)
 
 	tag := fmt.Sprintf("v%s", versionNameBase)
@@ -93,9 +98,14 @@ func extractVersionName(gradleFile string) (string, error) {
 	return "", errors.New("versionName not found")
 }
 
-func cleanVersionName(versionName string) string {
+func cleanVersionName(versionName, removeStringList string) string {
 	versionName = strings.TrimSpace(versionName)
-	versionName = strings.ReplaceAll(versionName, "-DEBUG", "")
+	removeStrings := strings.Split(removeStringList, ",")
+
+	for _, removeString := range removeStrings {
+		versionName = strings.ReplaceAll(versionName, strings.TrimSpace(removeString), "")
+	}
+
 	return versionName
 }
 
