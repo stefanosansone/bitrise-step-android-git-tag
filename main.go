@@ -16,7 +16,7 @@ import (
 func main() {
 	log.Infof("Starting script...")
 
-	gradleFile := os.Getenv("gradle_file")
+	gradleFile := os.Getenv("gradle_file_path")
 	if gradleFile == "" {
 		log.Errorf("Gradle file path is not set")
 		os.Exit(1)
